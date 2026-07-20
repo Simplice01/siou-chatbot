@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUp, Bot, Building2, FileText, Loader2, MessageSquarePlus, RefreshCw, ShieldCheck, Sparkles, User } from "lucide-react";
+import { ArrowUp, Bot, Building2, FileText, Loader2, RefreshCw, RotateCcw, ShieldCheck, Sparkles, User } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { formatConfidence } from "@/lib/format";
 import { api } from "@/services/api";
@@ -116,34 +116,35 @@ export default function HomePage() {
       <section className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-6 lg:px-8">
         <header className="mb-5 overflow-hidden rounded-lg border border-[#cfdccd] bg-paper shadow-panel">
           <div className="h-1.5 bg-gradient-to-r from-moss via-ocean to-copper" />
-          <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-5">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-ink text-paper shadow-sm">
-              <Building2 size={21} aria-hidden />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <h1 className="truncate text-lg font-semibold text-ink">SIOU</h1>
-                <span className="hidden rounded-md bg-sage px-2 py-1 text-xs font-medium text-moss sm:inline">Version pilote</span>
+          <div className="flex flex-col gap-4 px-4 py-4 sm:px-5 md:flex-row md:items-center md:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-ink text-paper shadow-sm">
+                <Building2 size={21} aria-hidden />
               </div>
-              <p className="truncate text-sm text-graphite/70">Assistant intelligent d'orientation des usagers vers les services compétents</p>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-xl font-semibold leading-none text-ink sm:text-2xl">SIOU</h1>
+                  <span className="rounded-md bg-sage px-2 py-1 text-xs font-medium text-moss">Version pilote</span>
+                </div>
+                <p className="mt-1 text-sm leading-5 text-graphite/70">Assistant intelligent d'orientation des usagers vers les services compétents</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
+          <div className="flex w-full items-center gap-2 md:w-auto">
             <button
               type="button"
               onClick={startNewChat}
-              className="inline-flex items-center gap-2 rounded-md border border-sage bg-paper px-3 py-2 text-sm font-medium text-graphite transition hover:border-moss hover:bg-sage"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-sage bg-[#f7faf5] px-3 py-2 text-sm font-medium text-graphite transition hover:border-moss hover:bg-sage md:flex-none"
               title="Vider le chat"
             >
-              <MessageSquarePlus size={16} aria-hidden />
-              Vider le chat
+              <RotateCcw size={15} aria-hidden />
+              <span className="sm:hidden">Vider</span>
+              <span className="hidden sm:inline">Vider le chat</span>
             </button>
             <button
               type="button"
               onClick={indexDocuments}
               disabled={indexing}
-              className="inline-flex items-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-medium text-paper transition hover:bg-graphite disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-medium text-paper transition hover:bg-graphite disabled:cursor-not-allowed disabled:opacity-60 md:flex-none"
               title="Indexer les PDF"
             >
               <RefreshCw size={16} className={indexing ? "animate-spin" : ""} aria-hidden />
