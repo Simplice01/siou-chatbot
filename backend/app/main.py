@@ -10,10 +10,11 @@ def create_app() -> FastAPI:
     configure_logging()
     settings = get_settings()
     app = FastAPI(title=settings.app_name, version="0.1.0")
+    allow_all_origins = "*" in settings.cors_origin_list
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origin_list,
-        allow_credentials=True,
+        allow_credentials=not allow_all_origins,
         allow_methods=["*"],
         allow_headers=["*"],
     )
@@ -22,4 +23,3 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-
