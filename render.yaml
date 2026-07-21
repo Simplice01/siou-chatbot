@@ -42,4 +42,16 @@ services:
         value: openai
       - key: LLM_TEMPERATURE
         value: "0.0"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: siou-postgres
+          property: connectionString
 
+databases:
+  - name: siou-postgres
+    plan: basic-256mb
+    databaseName: siou
+    user: siou_user
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: external-test-access

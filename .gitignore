@@ -20,3 +20,5 @@ backend/documents/*
 frontend/node_modules/
 frontend/.next/
 frontend/out/
+
+Data pour base postgreSQL/
