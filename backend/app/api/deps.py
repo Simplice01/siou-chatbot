@@ -53,5 +53,11 @@ def get_indexing_service() -> IndexingService:
 
 def get_rag_service() -> RagService:
     settings = get_settings()
-    retrieval = RetrievalService(get_embedding_service(), get_vector_store(), settings.top_k)
+    loader = DocumentLoader(settings, get_vector_store())
+    retrieval = RetrievalService(
+        get_embedding_service(),
+        get_vector_store(),
+        settings.top_k,
+        allowed_document_ids=lambda: {document.id for document in loader.list_documents()},
+    )
     return RagService(settings, retrieval, PromptService(), LLMService(settings), CitationService())

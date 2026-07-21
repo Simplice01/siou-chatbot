@@ -7,7 +7,7 @@ from app.services.database_service import DatabaseService
 from app.services.embedding_service import EmbeddingService
 from app.services.pdf_parser import PdfParser
 from app.services.vector_store_service import VectorStoreService
-from app.utils.files import file_sha256, is_pdf, safe_document_id
+from app.utils.files import file_sha256, is_supported_document, safe_document_id
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class IndexingService:
         reports = []
         paths = sorted({path for pattern in self.settings.document_patterns for path in self.settings.documents_dir.glob(pattern)})
         for path in paths:
-            if is_pdf(path):
+            if is_supported_document(path):
                 reports.append(await self.index_pdf(path))
         return reports
 

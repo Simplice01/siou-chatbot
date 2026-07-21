@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     database_url: str | None = None
 
     documents_dir: Path = Path("documents")
-    document_include_patterns: str = "*.pdf"
+    document_include_patterns: str = "*.pdf,*.docx"
     vector_store_dir: Path = Path("vector_store")
     chunk_size: int = Field(default=1200, ge=300)
     chunk_overlap: int = Field(default=220, ge=0)

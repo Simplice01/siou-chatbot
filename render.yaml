@@ -17,7 +17,7 @@ services:
       - key: DOCUMENTS_DIR
         value: documents
       - key: DOCUMENT_INCLUDE_PATTERNS
-        value: siou-annuaire-services-publics.pdf,siou-procedures-evenements-numeriques.pdf
+        value: "*.pdf,*.docx"
       - key: VECTOR_STORE_DIR
         value: vector_store
       - key: CHUNK_SIZE

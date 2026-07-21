@@ -246,10 +246,18 @@ class DatabaseService:
     ) -> None:
         with self.database.connection() as conn:
             with conn.cursor() as cur:
+                suffix = filename.lower().rsplit(".", 1)[-1]
+                source_kind = "word_interne" if suffix == "docx" else "pdf_officiel"
+                mime_type = (
+                    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    if suffix == "docx"
+                    else "application/pdf"
+                )
+                document_type = "document_interne" if suffix == "docx" else "autre"
                 cur.execute(
                     """
                     INSERT INTO source_files (kind, original_filename, mime_type, sha256, file_size_bytes, page_count, metadata)
-                    VALUES ('pdf_officiel', %s, 'application/pdf', %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)
                     ON CONFLICT (sha256) DO UPDATE SET
                       original_filename = EXCLUDED.original_filename,
                       file_size_bytes = EXCLUDED.file_size_bytes,
@@ -259,7 +267,9 @@ class DatabaseService:
                     RETURNING id
                     """,
                     (
+                        source_kind,
                         filename,
+                        mime_type,
                         digest,
                         size_bytes,
                         len(pages),
@@ -279,12 +289,13 @@ class DatabaseService:
                     INSERT INTO documents (
                       source_file_id, title, type, status, summary, raw_text, normalized_text, metadata
                     )
-                    VALUES (%s, %s, 'procedure', 'publie', %s, %s, %s, %s)
+                    VALUES (%s, %s, %s, 'publie', %s, %s, %s, %s)
                     RETURNING id
                     """,
                     (
                         source_file_id,
                         filename,
+                        document_type,
                         summary,
                         raw_text,
                         raw_text,

@@ -3,7 +3,7 @@ from pathlib import Path
 from app.core.config import Settings
 from app.schemas.document import DocumentSummary
 from app.services.vector_store_service import VectorStoreService
-from app.utils.files import is_pdf, safe_document_id
+from app.utils.files import is_supported_document, safe_document_id
 
 
 class DocumentLoader:
@@ -15,7 +15,7 @@ class DocumentLoader:
         docs: list[DocumentSummary] = []
         paths = sorted({path for pattern in self.settings.document_patterns for path in self.settings.documents_dir.glob(pattern)})
         for path in paths:
-            if not is_pdf(path):
+            if not is_supported_document(path):
                 continue
             stat = path.stat()
             doc_id = safe_document_id(path)

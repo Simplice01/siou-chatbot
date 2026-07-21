@@ -12,7 +12,7 @@ async def main() -> None:
     configure_logging()
     reports = await get_indexing_service().index_all()
     if not reports:
-        print("Aucun PDF trouve dans documents/.")
+        print("Aucun document supporte trouve dans documents/.")
         return
     for report in reports:
         print(report)
@@ -20,4 +20,3 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
-

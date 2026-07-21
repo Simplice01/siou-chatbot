@@ -1,12 +1,12 @@
 # SIOU Document AI
 
-Lecteur documentaire intelligent local. L'utilisateur ouvre un PDF, lit le document et dialogue avec une IA qui répond uniquement à partir du PDF ouvert.
+Lecteur documentaire intelligent local. L'utilisateur dialogue avec une IA qui répond uniquement à partir des documents PDF ou Word indexés.
 
 ## Architecture
 
 - `backend/` : FastAPI, PostgreSQL, parsing PDF, chunking, embeddings, FAISS, retrieval, prompt strict, LLM OpenAI ou Ollama.
 - `frontend/` : Next.js, TypeScript, TailwindCSS, bibliothèque de PDF, lecteur, zoom, pagination, recherche, panneau IA et sources cliquables.
-- `backend/documents/` : dossier local où déposer les PDF.
+- `backend/documents/` : dossier local où déposer les PDF et DOCX.
 - `backend/vector_store/` : index FAISS et métadonnées générés automatiquement.
 - `database/` : schéma PostgreSQL cible, données de référence et guide Render.
 
@@ -45,7 +45,7 @@ Le provider `hash` est disponible pour les tests locaux sans clé API. Pour une 
 
 ## Indexation
 
-Dépose les PDF dans :
+Dépose les PDF ou DOCX dans :
 
 ```text
 backend/documents/
