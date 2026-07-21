@@ -306,3 +306,8 @@ def admin_stats(db: DatabaseService = Depends(get_database_service)) -> dict[str
         return db.stats()
     except Exception as exc:
         raise _db_error(exc) from exc
+
+
+@router.get("/admin/index-status")
+def index_status(loader: DocumentLoader = Depends(get_document_loader)) -> list[DocumentSummary]:
+    return loader.list_documents()

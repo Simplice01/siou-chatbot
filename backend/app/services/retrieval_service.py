@@ -30,5 +30,8 @@ class RetrievalService:
         for document_id in self.vector_store.list_document_ids():
             if allowed is not None and document_id not in allowed:
                 continue
-            results.extend(self.vector_store.search(document_id, query, self.top_k))
+            try:
+                results.extend(self.vector_store.search(document_id, query, self.top_k))
+            except FileNotFoundError:
+                continue
         return sorted(results, key=lambda item: item[1], reverse=True)[: self.top_k]
