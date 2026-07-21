@@ -34,7 +34,11 @@ class IndexingService:
         paths = sorted({path for pattern in self.settings.document_patterns for path in self.settings.documents_dir.glob(pattern)})
         for path in paths:
             if is_supported_document(path):
-                reports.append(await self.index_pdf(path))
+                try:
+                    reports.append(await self.index_pdf(path))
+                except RuntimeError as exc:
+                    logger.warning("Indexation impossible pour %s: %s", path.name, exc)
+                    reports.append({"document": path.name, "status": "ocr_unavailable", "error": str(exc)})
         return reports
 
     async def index_pdf(self, path: Path) -> dict[str, object]:

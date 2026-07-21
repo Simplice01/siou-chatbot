@@ -60,6 +60,17 @@ python scripts/index_documents.py
 
 Le script détecte les nouveaux PDF, évite les doublons via empreinte SHA-256 et réindexe seulement les fichiers modifiés.
 
+Les PDF scannés sont traités automatiquement par OCR si aucun texte n'est extractible. En local Windows, installe Tesseract OCR puis renseigne si besoin :
+
+```env
+OCR_ENABLED=true
+OCR_LANGUAGE=fra+eng
+OCR_TESSDATA_DIR=tessdata
+TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+```
+
+Sur Render, `backend/Aptfile` installe Tesseract et les langues française/anglaise pendant le build.
+
 ## Lancement Backend
 
 ```bash

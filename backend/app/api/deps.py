@@ -43,7 +43,7 @@ def get_indexing_service() -> IndexingService:
     settings = get_settings()
     return IndexingService(
         settings,
-        PdfParser(),
+        PdfParser(settings),
         ChunkingService(settings.chunk_size, settings.chunk_overlap),
         get_embedding_service(),
         get_vector_store(),

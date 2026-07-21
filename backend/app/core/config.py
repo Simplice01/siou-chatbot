@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     chunk_overlap: int = Field(default=220, ge=0)
     top_k: int = Field(default=6, ge=1)
     min_confidence: float = Field(default=0.18, ge=0, le=1)
+    ocr_enabled: bool = True
+    ocr_language: str = "fra+eng"
+    ocr_dpi: int = Field(default=220, ge=120, le=400)
+    tesseract_cmd: str | None = None
+    ocr_tessdata_dir: Path | None = Path("tessdata")
 
     embedding_provider: str = "hash"
     embedding_dimensions: int = Field(default=384, ge=16)

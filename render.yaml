@@ -28,6 +28,14 @@ services:
         value: "6"
       - key: MIN_CONFIDENCE
         value: "0.18"
+      - key: OCR_ENABLED
+        value: "true"
+      - key: OCR_LANGUAGE
+        value: fra+eng
+      - key: OCR_DPI
+        value: "220"
+      - key: OCR_TESSDATA_DIR
+        value: tessdata
       - key: EMBEDDING_PROVIDER
         value: openai
       - key: OPENAI_API_KEY
