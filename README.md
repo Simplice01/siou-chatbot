@@ -4,10 +4,11 @@ Lecteur documentaire intelligent local. L'utilisateur ouvre un PDF, lit le docum
 
 ## Architecture
 
-- `backend/` : FastAPI, parsing PDF, chunking, embeddings, FAISS, retrieval, prompt strict, LLM OpenAI ou Ollama.
+- `backend/` : FastAPI, PostgreSQL, parsing PDF, chunking, embeddings, FAISS, retrieval, prompt strict, LLM OpenAI ou Ollama.
 - `frontend/` : Next.js, TypeScript, TailwindCSS, bibliothèque de PDF, lecteur, zoom, pagination, recherche, panneau IA et sources cliquables.
 - `backend/documents/` : dossier local où déposer les PDF.
 - `backend/vector_store/` : index FAISS et métadonnées générés automatiquement.
+- `database/` : schéma PostgreSQL cible, données de référence et guide Render.
 
 ## Configuration Backend
 
@@ -22,6 +23,7 @@ Copy-Item .env.example .env
 Variables principales dans `backend/.env` :
 
 ```env
+DATABASE_URL=postgresql://...
 EMBEDDING_PROVIDER=openai
 OPENAI_API_KEY=sk-...
 OPENAI_EMBEDDING_MODEL=text-embedding-3-small
@@ -69,9 +71,18 @@ Endpoints principaux :
 
 - `GET /api/health`
 - `GET /api/documents`
+- `GET /api/db/documents`
+- `GET /api/source-files`
+- `GET /api/organizations`
+- `GET /api/service-cards`
+- `GET /api/users`
+- `GET /api/conversations`
 - `GET /api/documents/{document_id}/file`
 - `POST /api/index`
+- `POST /api/documents/reindex`
 - `POST /api/chat`
+- `POST /api/feedback`
+- `GET /api/admin/stats`
 
 Payload chat :
 
@@ -152,3 +163,10 @@ frontend/
 
 Le prompt système impose une règle stricte : aucune connaissance externe. Si les extraits récupérés ne contiennent pas la réponse, l'API renvoie clairement que l'information est absente du document.
 
+## PostgreSQL et RAG
+
+L'application utilise une architecture hybride :
+
+- PostgreSQL structure les documents, fichiers sources, organisations, fiches services, conversations, messages et sources utilisées.
+- FAISS garde l'index vectoriel rapide pour retrouver les passages pertinents sans relire toute la base à chaque question.
+- `POST /api/chat` interroge l'index documentaire, demande au LLM de répondre uniquement à partir des extraits, puis enregistre la conversation et les sources dans PostgreSQL quand `DATABASE_URL` est configuré.

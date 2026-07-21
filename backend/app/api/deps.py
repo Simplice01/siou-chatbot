@@ -1,8 +1,10 @@
 from functools import lru_cache
 
 from app.core.config import get_settings
+from app.core.database import Database
 from app.services.chunking_service import ChunkingService
 from app.services.citation_service import CitationService
+from app.services.database_service import DatabaseService
 from app.services.document_loader import DocumentLoader
 from app.services.embedding_service import EmbeddingService
 from app.services.indexing_service import IndexingService
@@ -12,6 +14,15 @@ from app.services.prompt_service import PromptService
 from app.services.rag_service import RagService
 from app.services.retrieval_service import RetrievalService
 from app.services.vector_store_service import VectorStoreService
+
+
+@lru_cache
+def get_database() -> Database:
+    return Database(get_settings())
+
+
+def get_database_service() -> DatabaseService:
+    return DatabaseService(get_database())
 
 
 @lru_cache
@@ -36,6 +47,7 @@ def get_indexing_service() -> IndexingService:
         ChunkingService(settings.chunk_size, settings.chunk_overlap),
         get_embedding_service(),
         get_vector_store(),
+        get_database_service(),
     )
 
 
@@ -43,4 +55,3 @@ def get_rag_service() -> RagService:
     settings = get_settings()
     retrieval = RetrievalService(get_embedding_service(), get_vector_store(), settings.top_k)
     return RagService(settings, retrieval, PromptService(), LLMService(settings), CitationService())
-

@@ -1,28 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowUp, Bot, Building2, FileText, Loader2, RefreshCw, RotateCcw, ShieldCheck, Sparkles, User } from "lucide-react";
+import { ArrowUp, Bot, FileText, Loader2, RefreshCw, RotateCcw, ShieldCheck, Sparkles, User } from "lucide-react";
 import { FormEvent, useEffect, useRef, useState } from "react";
+import { AppShell } from "@/components/AppShell";
 import { formatConfidence } from "@/lib/format";
 import { api } from "@/services/api";
 import type { ChatMessage, ChatSource } from "@/types/document";
 
 const suggestedQuestions = [
   {
-    title: "Créer une startup",
-    question: "Je veux créer une startup numérique, par où dois-je commencer ?"
+    title: "Creer une startup",
+    question: "Je veux creer une startup numerique, par ou dois-je commencer ?"
   },
   {
-    title: "Incident cybersécurité",
-    question: "Quel service contacter pour un incident de cybersécurité sur une plateforme publique ?"
+    title: "Incident cybersecurite",
+    question: "Quel service contacter pour un incident de cybersecurite sur une plateforme publique ?"
   },
   {
     title: "Open data",
-    question: "Où dois-je orienter quelqu'un qui cherche une information sur l'open data ?"
+    question: "Ou dois-je orienter quelqu'un qui cherche une information sur l'open data ?"
   },
   {
-    title: "Événement IA",
-    question: "Y a-t-il un événement sur l'intelligence artificielle prévu en septembre 2026 ?"
+    title: "Evenement IA",
+    question: "Y a-t-il un evenement sur l'intelligence artificielle prevu en septembre 2026 ?"
   }
 ];
 
@@ -30,7 +31,7 @@ const welcomeMessage: ChatMessage = {
   id: "welcome",
   role: "assistant",
   content:
-    "Bonjour, je suis SIOU. Décrivez la demande de l’usager et je vous indique le service compétent, le contact utile et la source documentaire utilisée."
+    "Bonjour, je suis SIOU. Decrivez la demande de l'usager et je vous indique le service competent, le contact utile et la source documentaire utilisee."
 };
 
 export default function HomePage() {
@@ -38,6 +39,7 @@ export default function HomePage() {
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [indexing, setIndexing] = useState(false);
+  const [conversationId, setConversationId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -54,7 +56,8 @@ export default function HomePage() {
     setLoading(true);
 
     try {
-      const response = await api.chat(current);
+      const response = await api.chat(current, undefined, conversationId);
+      setConversationId(response.conversation_id ?? conversationId);
       setMessages((items) => [
         ...items,
         {
@@ -71,7 +74,7 @@ export default function HomePage() {
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: error instanceof Error ? error.message : "Je n'ai pas pu préparer la réponse."
+          content: error instanceof Error ? error.message : "Je n'ai pas pu preparer la reponse."
         }
       ]);
     } finally {
@@ -88,7 +91,7 @@ export default function HomePage() {
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: "Indexation terminée. Tu peux maintenant poser tes questions sur les documents."
+          content: "Indexation terminee. Les PDF locaux sont synchronises avec la base et l'index de recherche."
         }
       ]);
     } catch (error) {
@@ -97,7 +100,7 @@ export default function HomePage() {
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: error instanceof Error ? error.message : "L'indexation a échoué."
+          content: error instanceof Error ? error.message : "L'indexation a echoue."
         }
       ]);
     } finally {
@@ -108,32 +111,23 @@ export default function HomePage() {
   function startNewChat() {
     setQuestion("");
     setLoading(false);
+    setConversationId(null);
     setMessages([{ ...welcomeMessage, id: crypto.randomUUID() }]);
   }
 
   return (
-    <main className="min-h-screen bg-[#eef3ef] text-ink">
-      <section className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-5 sm:px-6 lg:px-8">
-        <header className="mb-5 overflow-hidden rounded-lg border border-[#cfdccd] bg-paper shadow-panel">
-          <div className="h-1.5 bg-gradient-to-r from-moss via-ocean to-copper" />
-          <div className="flex flex-col gap-4 px-4 py-4 sm:px-5 md:flex-row md:items-center md:justify-between">
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-ink text-paper shadow-sm">
-                <Building2 size={21} aria-hidden />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-xl font-semibold leading-none text-ink sm:text-2xl">SIOU</h1>
-                  <span className="rounded-md bg-sage px-2 py-1 text-xs font-medium text-moss">Version pilote</span>
-                </div>
-                <p className="mt-1 text-sm leading-5 text-graphite/70">Assistant intelligent d'orientation des usagers vers les services compétents</p>
-              </div>
-            </div>
-          <div className="flex w-full items-center gap-2 md:w-auto">
+    <AppShell>
+      <section className="flex min-h-0 flex-1 flex-col">
+        <div className="mb-4 flex flex-col gap-3 rounded-lg border border-[#cfdccd] bg-paper p-3 shadow-panel sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-ink">Chatbot documentaire SIOU</p>
+            <p className="text-sm text-graphite/70">Il repond uniquement a partir des documents indexes localement.</p>
+          </div>
+          <div className="flex w-full items-center gap-2 sm:w-auto">
             <button
               type="button"
               onClick={startNewChat}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-sage bg-[#f7faf5] px-3 py-2 text-sm font-medium text-graphite transition hover:border-moss hover:bg-sage md:flex-none"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md border border-sage bg-[#f7faf5] px-3 py-2 text-sm font-medium text-graphite transition hover:border-moss hover:bg-sage sm:flex-none"
               title="Vider le chat"
             >
               <RotateCcw size={15} aria-hidden />
@@ -144,15 +138,14 @@ export default function HomePage() {
               type="button"
               onClick={indexDocuments}
               disabled={indexing}
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-medium text-paper transition hover:bg-graphite disabled:cursor-not-allowed disabled:opacity-60 md:flex-none"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-medium text-paper transition hover:bg-graphite disabled:cursor-not-allowed disabled:opacity-60 sm:flex-none"
               title="Indexer les PDF"
             >
               <RefreshCw size={16} className={indexing ? "animate-spin" : ""} aria-hidden />
               Indexer
             </button>
           </div>
-          </div>
-        </header>
+        </div>
 
         <div className="thin-scrollbar min-h-0 flex-1 overflow-y-auto rounded-lg border border-[#cfdccd] bg-[#fbfcf8] shadow-panel">
           <div className="space-y-5 p-4 sm:p-6">
@@ -166,8 +159,8 @@ export default function HomePage() {
                   <Loader2 size={18} className="animate-spin" aria-hidden />
                 </div>
                 <div className="rounded-md border border-sage bg-paper px-4 py-3 text-sm text-graphite">
-                  <p className="font-medium text-ink">Préparation de la réponse...</p>
-                  <p className="mt-1 text-xs text-graphite/70">Analyse des documents et identification du service compétent.</p>
+                  <p className="font-medium text-ink">Preparation de la reponse...</p>
+                  <p className="mt-1 text-xs text-graphite/70">Analyse des documents et identification du service competent.</p>
                 </div>
               </motion.div>
             )}
@@ -205,7 +198,7 @@ export default function HomePage() {
                   submit();
                 }
               }}
-              placeholder="Décrivez la demande de l’usager..."
+              placeholder="Decrivez la demande de l'usager..."
               rows={2}
               className="min-h-14 flex-1 resize-none rounded-md border-sage bg-mist text-sm leading-6 focus:border-moss focus:ring-moss"
             />
@@ -219,11 +212,8 @@ export default function HomePage() {
             </button>
           </div>
         </form>
-        <footer className="px-2 py-3 text-center text-xs text-graphite/60">
-          SIOU · Système Intelligent d’Orientation des Usagers · Environnement de test
-        </footer>
       </section>
-    </main>
+    </AppShell>
   );
 }
 
@@ -245,7 +235,7 @@ function ChatBubble({ message }: { message: ChatMessage }) {
         {!isUser && typeof message.confidence === "number" && (
           <p className="mt-2 inline-flex items-center gap-1 rounded-md bg-sage px-2 py-1 text-xs font-medium text-moss">
             <ShieldCheck size={13} aria-hidden />
-            Fiabilité estimée : {formatConfidence(message.confidence)}
+            Fiabilite estimee : {formatConfidence(message.confidence)}
           </p>
         )}
         {!isUser && message.sources && message.sources.length > 0 && <SourceList sources={message.sources} />}

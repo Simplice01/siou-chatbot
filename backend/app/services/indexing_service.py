@@ -3,6 +3,7 @@ from pathlib import Path
 
 from app.core.config import Settings
 from app.services.chunking_service import ChunkingService
+from app.services.database_service import DatabaseService
 from app.services.embedding_service import EmbeddingService
 from app.services.pdf_parser import PdfParser
 from app.services.vector_store_service import VectorStoreService
@@ -19,12 +20,14 @@ class IndexingService:
         chunker: ChunkingService,
         embeddings: EmbeddingService,
         vector_store: VectorStoreService,
+        database: DatabaseService | None = None,
     ) -> None:
         self.settings = settings
         self.parser = parser
         self.chunker = chunker
         self.embeddings = embeddings
         self.vector_store = vector_store
+        self.database = database
 
     async def index_all(self) -> list[dict[str, object]]:
         reports = []
@@ -40,6 +43,13 @@ class IndexingService:
         stat = path.stat()
         current = self.vector_store.read_metadata(document_id)
         if current and current.get("sha256") == digest and current.get("modified_at") == stat.st_mtime:
+            if self.database:
+                try:
+                    pages = self.parser.parse(path)
+                    chunks = self.vector_store.load_chunks(document_id)
+                    self.database.sync_indexed_document(path.name, digest, stat.st_size, pages, chunks)
+                except Exception:
+                    logger.exception("Synchronisation PostgreSQL impossible pour %s", path.name)
             return {"document": path.name, "document_id": document_id, "status": "skipped"}
         pages = self.parser.parse(path)
         chunks = self.chunker.chunk_pages(document_id, path.name, pages)
@@ -57,5 +67,10 @@ class IndexingService:
             "active": True,
         }
         self.vector_store.save(document_id, vectors, chunks, metadata)
+        if self.database:
+            try:
+                self.database.sync_indexed_document(path.name, digest, stat.st_size, pages, chunks)
+            except Exception:
+                logger.exception("Synchronisation PostgreSQL impossible pour %s", path.name)
         logger.info("Indexed %s with %s chunks", path.name, len(chunks))
         return {"document": path.name, "document_id": document_id, "status": "indexed", "chunks": len(chunks)}
