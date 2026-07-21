@@ -32,6 +32,8 @@ class IndexingService:
     async def index_all(self) -> list[dict[str, object]]:
         reports = []
         paths = sorted({path for pattern in self.settings.document_patterns for path in self.settings.documents_dir.glob(pattern)})
+        if not any(is_supported_document(path) for path in paths):
+            paths = sorted(self.settings.documents_dir.iterdir())
         for path in paths:
             if is_supported_document(path):
                 try:

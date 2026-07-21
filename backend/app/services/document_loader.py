@@ -13,7 +13,7 @@ class DocumentLoader:
 
     def list_documents(self) -> list[DocumentSummary]:
         docs: list[DocumentSummary] = []
-        paths = sorted({path for pattern in self.settings.document_patterns for path in self.settings.documents_dir.glob(pattern)})
+        paths = self._document_paths()
         for path in paths:
             if not is_supported_document(path):
                 continue
@@ -34,8 +34,15 @@ class DocumentLoader:
         return docs
 
     def resolve_pdf(self, document: str) -> Path:
-        paths = sorted({path for pattern in self.settings.document_patterns for path in self.settings.documents_dir.glob(pattern)})
+        paths = self._document_paths()
         for path in paths:
             if path.name == document or safe_document_id(path) == document:
                 return path
         raise FileNotFoundError(f"Document introuvable: {document}")
+
+    def _document_paths(self) -> list[Path]:
+        paths = sorted({path for pattern in self.settings.document_patterns for path in self.settings.documents_dir.glob(pattern)})
+        supported = [path for path in paths if is_supported_document(path)]
+        if supported:
+            return supported
+        return sorted(path for path in self.settings.documents_dir.iterdir() if is_supported_document(path))
